@@ -1,6 +1,6 @@
 # coding=utf-8
 import json
-from datetime import *
+from datetime import datetime, date
 import workdays
 
 from appJar import gui

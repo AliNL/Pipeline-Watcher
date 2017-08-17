@@ -6,8 +6,8 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
 
-def open_browser():
-    with open('data.json', 'r') as f:
+def open_browser(bundle_dir):
+    with open(bundle_dir + '/data.json', 'r') as f:
         data = json.load(f)
     ci = webdriver.Firefox()
     ci.maximize_window()

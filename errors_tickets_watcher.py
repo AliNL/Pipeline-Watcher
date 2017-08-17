@@ -21,10 +21,10 @@ def get_person_today(data):
     return dev_today, bqa_today
 
 
-def errors_tickets_window(w, h, x, y):
+def errors_tickets_window(w, h, x, y, bundle_dir):
     drag_from = None
     today = datetime.today().date()
-    with open('data.json', 'r') as fr:
+    with open(bundle_dir + '/data.json', 'r') as fr:
         data = json.load(fr)
     dev_list = data['dev_list']
     bqa_list = data['bqa_list']
@@ -69,7 +69,7 @@ def errors_tickets_window(w, h, x, y):
                 bqa_start = workdays.workday(today, -bqa_list.index(widget[3:]))
                 data['bqa_start_day'] = [bqa_start.year, bqa_start.month, bqa_start.day]
 
-            with open('data.json', 'w') as fw:
+            with open(bundle_dir + '/data.json', 'w') as fw:
                 json.dump(data, fw)
 
         else:

@@ -5,4 +5,5 @@ For PSA Team internal
 1. Install Firefox, latest version
 1. Put "geckodriver" in "/usr/local/bin" or add its dirctory to PATH
 1. Put "data.json" in same directory with "Pipeline Watcher"
+1. Make alias on desktop
 1. Run

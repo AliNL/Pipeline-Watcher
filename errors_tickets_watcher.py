@@ -89,12 +89,6 @@ class ErrorsTicketsWindow(object):
             self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
             self.browsers_watching.start()
 
-    def close_browsers(self):
-        for p in self.pipelines:
-            p.quit()
-        self.pipelines = []
-        self.app.stop()
-
     def start(self):
         w = self.app.topLevel.winfo_screenwidth()
         h = self.app.topLevel.winfo_screenheight()
@@ -115,6 +109,5 @@ class ErrorsTicketsWindow(object):
         self.app.setStretch("row")
         self.app.setSticky(None)
         self.app.registerEvent(self.update_person)
-        self.app.setPollTime(3000)
-        # self.app.setStopFunction(self.close_browsers)
+        self.app.setPollTime(600000)
         self.app.go()

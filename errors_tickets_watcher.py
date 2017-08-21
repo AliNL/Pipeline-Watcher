@@ -11,7 +11,7 @@ class ErrorsTicketsWindow(object):
     def __init__(self, bundle_dir):
         self.bundle_dir = bundle_dir
         with open(bundle_dir + '/data.json', 'r') as fr:
-                data = json.load(fr)
+            data = json.load(fr)
         self.data = data
         self.dev_list = self.data['dev_list']
         self.bqa_list = self.data['bqa_list']
@@ -43,7 +43,8 @@ class ErrorsTicketsWindow(object):
             self.app.setLabelBg("bqa" + bqa, "white")
             self.app.setLabelFg("bqa" + bqa, "black")
             self.app.setLabelCursor("bqa" + bqa, "arrow")
-
+        self.app.unbindKey("<ButtonPress-1>")
+        self.app.unbindKey("<ButtonRelease-1>")
         self.app.setLabelBg("dev" + self.dev_today, "#535353")
         self.app.setLabelFg("dev" + self.dev_today, "white")
         self.app.setLabelBg("bqa" + self.bqa_today, "#535353")
@@ -65,11 +66,11 @@ class ErrorsTicketsWindow(object):
             self.app.unbindKey("<ButtonRelease-1>")
             self.app.setLabelDragFunction(widget, [self.drag, self.drop])
 
-            if widget[3:] in self.dev_list:
+            if widget[:3] == 'dev':
                 dev_start = workdays.workday(self.today, -self.dev_list.index(widget[3:]))
                 self.data['dev_start_day'] = [dev_start.year, dev_start.month, dev_start.day]
                 self.dev_start_day = date(*self.data['dev_start_day'])
-            elif widget[3:] in self.bqa_list:
+            elif widget[:3] == 'bqa':
                 bqa_start = workdays.workday(self.today, -self.bqa_list.index(widget[3:]))
                 self.data['bqa_start_day'] = [bqa_start.year, bqa_start.month, bqa_start.day]
                 self.bqa_start_day = date(*self.data['bqa_start_day'])

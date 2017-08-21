@@ -1,14 +1,11 @@
 # coding=utf-8
-import json
-import os
 import time
+import os
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
 
-def open_browser(bundle_dir):
-    with open(bundle_dir + '/data.json', 'r') as f:
-        data = json.load(f)
+def open_browser(data):
     ci = webdriver.Firefox()
     ci.maximize_window()
     w = ci.get_window_size()['width']
@@ -29,7 +26,7 @@ def open_browser(bundle_dir):
     cd.find_element_by_id('user_login').send_keys(data["cd_username"])
     cd.find_element_by_id('user_password').send_keys(data["cd_password"])
     cd.find_element_by_id('signin2').click()
-    return ci, cd, w, h
+    return ci, cd
 
 
 def get_status(pipeline, retry=5):

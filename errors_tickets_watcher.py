@@ -1,106 +1,120 @@
 # coding=utf-8
 import json
-from datetime import datetime, date
+import threading
 import workdays
-
 from appJar import gui
+from datetime import datetime, date
+from browsers_watcher import open_browser, watch
 
 
-def get_person_today(data):
-    dev_list = data['dev_list']
-    bqa_list = data['bqa_list']
-    dev_start_day = date(*data['dev_start_day'])
-    bqa_start_day = date(*data['bqa_start_day'])
+class ErrorsTicketsWindow(object):
+    def __init__(self, bundle_dir):
+        self.bundle_dir = bundle_dir
+        with open(bundle_dir + '/data.json', 'r') as fr:
+                data = json.load(fr)
+        self.data = data
+        self.dev_list = self.data['dev_list']
+        self.bqa_list = self.data['bqa_list']
+        self.dev_start_day = date(*self.data['dev_start_day'])
+        self.bqa_start_day = date(*self.data['bqa_start_day'])
+        self.dev_today = None
+        self.bqa_today = None
+        self.today = datetime.today().date()
+        self.get_person_today()
+        self.app = gui("Errors & Tickets")
+        self.drag_from = None
+        self.pipelines = open_browser(self.data)
+        self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
+        self.browsers_watching.start()
 
-    today = datetime.today().date()
-    dev_workdays = workdays.networkdays(dev_start_day, today) - 1
-    bqa_workdays = workdays.networkdays(bqa_start_day, today) - 1
+    def get_person_today(self):
+        dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
+        bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
+        self.dev_today = self.dev_list[dev_workdays % len(self.dev_list)]
+        self.bqa_today = self.bqa_list[bqa_workdays % len(self.bqa_list)]
 
-    dev_today = dev_list[dev_workdays % len(dev_list)]
-    bqa_today = bqa_list[bqa_workdays % len(bqa_list)]
-    return dev_today, bqa_today
+    def set_person_today(self):
+        for dev in self.dev_list:
+            self.app.setLabelBg("dev" + dev, "white")
+            self.app.setLabelFg("dev" + dev, "black")
+            self.app.setLabelCursor("dev" + dev, "arrow")
+        for bqa in self.bqa_list:
+            self.app.setLabelBg("bqa" + bqa, "white")
+            self.app.setLabelFg("bqa" + bqa, "black")
+            self.app.setLabelCursor("bqa" + bqa, "arrow")
 
+        self.app.setLabelBg("dev" + self.dev_today, "#535353")
+        self.app.setLabelFg("dev" + self.dev_today, "white")
+        self.app.setLabelBg("bqa" + self.bqa_today, "#535353")
+        self.app.setLabelFg("bqa" + self.bqa_today, "white")
+        self.app.setLabelDragFunction("dev" + self.dev_today, [self.drag, self.drop])
+        self.app.setLabelDragFunction("bqa" + self.bqa_today, [self.drag, self.drop])
 
-def errors_tickets_window(w, h, x, y, bundle_dir):
-    drag_from = None
-    today = datetime.today().date()
-    with open(bundle_dir + '/data.json', 'r') as fr:
-        data = json.load(fr)
-    dev_list = data['dev_list']
-    bqa_list = data['bqa_list']
+    def drag(self, widget):
+        self.app.setLabelBg(widget, "white")
+        self.app.setLabelFg(widget, "black")
+        self.drag_from = widget
 
-    def set_person_today(dev_today, bqa_today):
-        for dev0 in dev_list:
-            app.setLabelBg("dev" + dev0, "white")
-            app.setLabelFg("dev" + dev0, "black")
-            app.setLabelCursor("dev" + dev0, "arrow")
-        for bqa0 in bqa_list:
-            app.setLabelBg("bqa" + bqa0, "white")
-            app.setLabelFg("bqa" + bqa0, "black")
-            app.setLabelCursor("bqa" + bqa0, "arrow")
+    def drop(self, widget):
+        if self.drag_from[:3] == widget[:3]:
+            self.app.setLabelBg(widget, "#535353")
+            self.app.setLabelFg(widget, "white")
+            self.app.setLabelCursor(self.drag_from, "arrow")
+            self.app.unbindKey("<ButtonPress-1>")
+            self.app.unbindKey("<ButtonRelease-1>")
+            self.app.setLabelDragFunction(widget, [self.drag, self.drop])
 
-        app.setLabelBg(dev_today, "#535353")
-        app.setLabelFg(dev_today, "white")
-        app.setLabelBg(bqa_today, "#535353")
-        app.setLabelFg(bqa_today, "white")
-        app.setLabelDragFunction(dev_today, [drag, drop])
-        app.setLabelDragFunction(bqa_today, [drag, drop])
+            if widget[3:] in self.dev_list:
+                dev_start = workdays.workday(self.today, -self.dev_list.index(widget[3:]))
+                self.data['dev_start_day'] = [dev_start.year, dev_start.month, dev_start.day]
+                self.dev_start_day = date(*self.data['dev_start_day'])
+            elif widget[3:] in self.bqa_list:
+                bqa_start = workdays.workday(self.today, -self.bqa_list.index(widget[3:]))
+                self.data['bqa_start_day'] = [bqa_start.year, bqa_start.month, bqa_start.day]
+                self.bqa_start_day = date(*self.data['bqa_start_day'])
 
-    def drag(widget):
-        app.setLabelBg(widget, "white")
-        app.setLabelFg(widget, "black")
-        global drag_from
-        drag_from = widget
-
-    def drop(widget):
-        global drag_from
-        if drag_from[:3] == widget[:3]:
-            app.setLabelBg(widget, "#535353")
-            app.setLabelFg(widget, "white")
-            app.setLabelCursor(drag_from, "arrow")
-            app.unbindKey("<ButtonPress-1>")
-            app.unbindKey("<ButtonRelease-1>")
-            app.setLabelDragFunction(widget, [drag, drop])
-
-            if widget[3:] in dev_list:
-                dev_start = workdays.workday(today, -dev_list.index(widget[3:]))
-                data['dev_start_day'] = [dev_start.year, dev_start.month, dev_start.day]
-            elif widget[3:] in bqa_list:
-                bqa_start = workdays.workday(today, -bqa_list.index(widget[3:]))
-                data['bqa_start_day'] = [bqa_start.year, bqa_start.month, bqa_start.day]
-
-            with open(bundle_dir + '/data.json', 'w') as fw:
-                json.dump(data, fw)
-
+            with open(self.bundle_dir + '/data.json', 'w') as fw:
+                json.dump(self.data, fw)
         else:
-            app.setLabelBg(drag_from, "#535353")
-            app.setLabelFg(drag_from, "white")
+            self.app.setLabelBg(self.drag_from, "#535353")
+            self.app.setLabelFg(self.drag_from, "white")
 
-    def update_person():
-        dev_today, bqa_today = get_person_today(data)
-        set_person_today("dev" + dev_today, "bqa" + bqa_today)
+    def update_person(self):
+        self.get_person_today()
+        self.set_person_today()
+        self.check_browsers_alive()
 
-    app = gui("Errors & Tickets")
-    app.setGeom(int(w), int(h))
-    app.setLocation(int(x), int(y))
-    app.setGuiPadding(50, 40)
-    app.setFont(32)
-    app.setPadding(10, 30)
+    def check_browsers_alive(self):
+        if not self.browsers_watching.isAlive():
+            self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
+            self.browsers_watching.start()
 
-    i = 0
-    for dev in dev_list:
-        app.addLabel("dev" + dev, dev, 0, i, 1, 1)
-        i += 1
+    def close_browsers(self):
+        for p in self.pipelines:
+            p.quit()
+        self.pipelines = []
+        self.app.stop()
 
-    i = 0
-    for bqa in bqa_list:
-        app.addLabel("bqa" + bqa, bqa, 1, i, 1, 1)
-        i += 1
+    def start(self):
+        w = self.app.topLevel.winfo_screenwidth()
+        h = self.app.topLevel.winfo_screenheight()
+        self.app.setGeom(int(w / 2), int(h * 0.4 - 25))
+        self.app.setLocation(0, int(h * 0.6 + 10))
+        self.app.setGuiPadding(50, 40)
+        self.app.setFont(32)
+        self.app.setPadding(10, 30)
 
-    app.setAllLabelWidths(15)
-    app.setAllLabelHeights(1)
-    app.setStretch("row")
-    app.setSticky(None)
-    app.registerEvent(update_person)
-    app.setPollTime(600000)
-    app.go()
+        for i in range(len(self.dev_list)):
+            self.app.addLabel("dev" + self.dev_list[i], self.dev_list[i], 0, i, 1, 1)
+
+        for i in range(len(self.bqa_list)):
+            self.app.addLabel("bqa" + self.bqa_list[i], self.bqa_list[i], 1, i, 1, 1)
+
+        self.app.setAllLabelWidths(15)
+        self.app.setAllLabelHeights(1)
+        self.app.setStretch("row")
+        self.app.setSticky(None)
+        self.app.registerEvent(self.update_person)
+        self.app.setPollTime(3000)
+        # self.app.setStopFunction(self.close_browsers)
+        self.app.go()

@@ -28,6 +28,7 @@ class ErrorsTicketsWindow(object):
         self.browsers_watching.start()
 
     def get_person_today(self):
+        self.today = datetime.today().date()
         dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
         bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
         self.dev_today = self.dev_list[dev_workdays % len(self.dev_list)]

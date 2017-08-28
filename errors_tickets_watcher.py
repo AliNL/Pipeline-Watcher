@@ -31,8 +31,20 @@ class ErrorsTicketsWindow(object):
         self.today = datetime.today().date()
         dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
         bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
-        self.dev_today = self.dev_list[dev_workdays % len(self.dev_list)]
-        self.bqa_today = self.bqa_list[bqa_workdays % len(self.bqa_list)]
+        dev_idx = dev_workdays % len(self.dev_list)
+        bqa_idx = bqa_workdays % len(self.bqa_list)
+        self.dev_today = self.dev_list[dev_idx]
+        self.bqa_today = self.bqa_list[bqa_idx]
+
+        if dev_idx == 0:
+            self.data['dev_start_day'] = [self.today.year, self.today.month, self.today.day]
+            self.dev_start_day = date(*self.data['dev_start_day'])
+        elif bqa_idx == 0:
+            self.data['bqa_start_day'] = [self.today.year, self.today.month, self.today.day]
+            self.bqa_start_day = date(*self.data['bqa_start_day'])
+
+        with open(self.bundle_dir + '/data.json', 'w') as fw:
+            json.dump(self.data, fw)
 
     def set_person_today(self):
         for dev in self.dev_list:

@@ -6,7 +6,7 @@ from selenium.common.exceptions import WebDriverException
 
 
 def open_browser(data):
-    ci = webdriver.Firefox()
+    ci = webdriver.Chrome()
     ci.maximize_window()
     w = ci.get_window_size()['width']
     h = ci.get_window_size()['height']

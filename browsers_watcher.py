@@ -5,11 +5,8 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
 
-def open_browser(data):
+def open_browser(data, w, h):
     ci = webdriver.Chrome()
-    ci.maximize_window()
-    w = ci.get_window_size()['width']
-    h = ci.get_window_size()['height']
     ci.set_window_size(w / 2, h * 0.6)
     ci.set_window_position(0, 0)
     ci.get('https://goci.psa.thoughtworks.net/go/pipelines')

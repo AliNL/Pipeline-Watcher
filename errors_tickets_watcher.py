@@ -23,7 +23,9 @@ class ErrorsTicketsWindow(object):
         self.get_person_today()
         self.app = gui("Errors & Tickets")
         self.drag_from = None
-        self.pipelines = open_browser(self.data)
+        self.w = self.app.topLevel.winfo_screenwidth()
+        self.h = self.app.topLevel.winfo_screenheight()
+        self.pipelines = open_browser(self.data, self.w, self.h)
         self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
         self.browsers_watching.start()
 
@@ -104,10 +106,8 @@ class ErrorsTicketsWindow(object):
             self.browsers_watching.start()
 
     def start(self):
-        w = self.app.topLevel.winfo_screenwidth()
-        h = self.app.topLevel.winfo_screenheight()
-        self.app.setGeom(int(w / 2), int(h * 0.4 - 25))
-        self.app.setLocation(0, int(h * 0.6 + 10))
+        self.app.setGeom(int(self.w / 2), int(self.h * 0.4 - 25))
+        self.app.setLocation(0, int(self.h * 0.6 + 10))
         self.app.setGuiPadding(50, 40)
         self.app.setFont(32)
         self.app.setPadding(10, 30)

@@ -38,15 +38,19 @@ class ErrorsTicketsWindow(object):
         self.dev_today = self.dev_list[dev_idx]
         self.bqa_today = self.bqa_list[bqa_idx]
 
-        if dev_idx == 0:
+        update = False
+        if dev_idx == 0 and self.data['dev_start_day'][2] != self.today.day:
             self.data['dev_start_day'] = [self.today.year, self.today.month, self.today.day]
             self.dev_start_day = date(*self.data['dev_start_day'])
-        elif bqa_idx == 0:
+            update = True
+        if bqa_idx == 0 and self.data['bqa_start_day'][2] != self.today.day:
             self.data['bqa_start_day'] = [self.today.year, self.today.month, self.today.day]
             self.bqa_start_day = date(*self.data['bqa_start_day'])
+            update = True
 
-        with open(self.bundle_dir + '/data.json', 'w') as fw:
-            json.dump(self.data, fw)
+        if update:
+            with open(self.bundle_dir + '/data.json', 'w') as fw:
+                json.dump(self.data, fw)
 
     def set_person_today(self):
         for dev in self.dev_list:

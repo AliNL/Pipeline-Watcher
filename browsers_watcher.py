@@ -15,7 +15,7 @@ def open_browser(data, w, h):
     ci.find_element_by_id('user_password').send_keys(data["ci_password"])
     ci.find_element_by_id('signin2').click()
 
-    cd = webdriver.Firefox()
+    cd = webdriver.Chrome()
     cd.set_window_size(w / 2, h)
     cd.set_window_position(w / 2 + 1, 0)
     cd.get('https://gocd.thoughtworks.net/go/pipelines')

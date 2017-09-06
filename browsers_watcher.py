@@ -49,6 +49,9 @@ def watch(watch_list):
     time.sleep(10)
     while True:
         i = 0
+        if time.localtime().tm_wday < 5 and time.localtime().tm_hour == 9 and time.localtime(
+                        time.time() + 10).tm_hour == 10:
+            os.system('say "Dev Huddle time"')
         for pipeline in watch_list:
             current_status = get_status(pipeline)
             for status in current_status:

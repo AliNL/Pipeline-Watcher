@@ -32,7 +32,8 @@ def get_status(pipeline, retry=5):
         status_elements = pipeline.find_elements_by_css_selector('a.stage')
         current_status = [s.get_attribute('href')[url_length:] for s in status_elements
                           if 'Fail' in s.find_element_by_css_selector('div.stage_bar').get_attribute('title')]
-        return current_status
+        psa_status = [s for s in current_status if not s.startswith('Identity') and not s.startswith('GoFigure')]
+        return psa_status
     except WebDriverException:
         if retry > 0:
             return get_status(pipeline, retry - 1)

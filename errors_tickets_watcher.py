@@ -26,7 +26,7 @@ class ErrorsTicketsWindow(object):
         self.w = self.app.topLevel.winfo_screenwidth()
         self.h = self.app.topLevel.winfo_screenheight()
         self.pipelines = open_browser(self.data, self.w, self.h)
-        self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
+        self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines, self.bundle_dir])
         self.browsers_watching.start()
 
     def get_person_today(self):
@@ -106,7 +106,7 @@ class ErrorsTicketsWindow(object):
 
     def check_browsers_alive(self):
         if not self.browsers_watching.isAlive():
-            self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines])
+            self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines, self.bundle_dir])
             self.browsers_watching.start()
 
     def start(self):

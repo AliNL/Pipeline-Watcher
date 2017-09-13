@@ -1,6 +1,7 @@
 # coding=utf-8
-import time
-import os
+from datetime import datetime, time
+from time import sleep
+from os import system
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
@@ -10,7 +11,7 @@ def open_browser(data, w, h):
     ci.set_window_size(w / 2, h * 0.6)
     ci.set_window_position(0, 0)
     ci.get('https://goci.psa.thoughtworks.net/go/pipelines')
-    time.sleep(1)
+    sleep(1)
     ci.find_element_by_id('user_login').send_keys(data["ci_username"])
     ci.find_element_by_id('user_password').send_keys(data["ci_password"])
     ci.find_element_by_id('signin2').click()
@@ -19,7 +20,7 @@ def open_browser(data, w, h):
     cd.set_window_size(w / 2, h)
     cd.set_window_position(w / 2 + 1, 0)
     cd.get('https://gocd.thoughtworks.net/go/pipelines')
-    time.sleep(1)
+    sleep(1)
     cd.find_element_by_id('user_login').send_keys(data["cd_username"])
     cd.find_element_by_id('user_password').send_keys(data["cd_password"])
     cd.find_element_by_id('signin2').click()
@@ -41,27 +42,29 @@ def get_status(pipeline, retry=5):
             return []
 
 
-def watch(watch_list):
+def watch(watch_list, bundle_dir):
     last_status = []
     for pipeline in watch_list:
         this_status = get_status(pipeline)
         last_status.append(this_status)
-    time.sleep(10)
+    sleep(10)
     dev_huddle = False
     while True:
-        i = 0
-        if time.localtime().tm_wday < 5 and time.localtime().tm_hour < 10:
+        if datetime.now().time() < time(9, 58):
             dev_huddle = True
-        if dev_huddle and time.localtime().tm_hour == 10:
-            os.system('say "Dev Huddle time"')
+        elif dev_huddle:
+            for i in range(2):
+                system('afplay ' + bundle_dir + '/alarm.aiff -t 2.5 -v 10')
+                system('say "Dev huddle time[[slnc 800]]"')
             dev_huddle = False
+        i = 0
         for pipeline in watch_list:
             current_status = get_status(pipeline)
             for status in current_status:
                 if status not in last_status[i]:
-                    print(time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime()), status)
-                    os.system('say "Pipeline Broken[[slnc 1000]]"')
-                    os.system('say "' + status.replace("/", "[[slnc 300]]") + '"')
+                    print(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"), status)
+                    system('say "Pipeline Broken[[slnc 1000]]"')
+                    system('say "' + status.replace("/", "[[slnc 300]]") + '"')
             last_status[i] = current_status
             i += 1
-        time.sleep(10)
+        sleep(10)

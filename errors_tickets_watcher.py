@@ -3,8 +3,21 @@ import json
 import threading
 import workdays
 from appJar import gui
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from browsers_watcher import open_browser, watch
+
+(MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
+
+
+def networkdays_without_tuesday(start_date, end_date):
+    weekends = (SAT, SUN, TUE)
+    delta_days = (end_date - start_date).days + 1
+    full_weeks, extra_days = divmod(delta_days, 7)
+    num_workdays = (full_weeks + 1) * (7 - len(weekends))
+    for d in range(1, 8 - extra_days):
+        if (end_date + timedelta(d)).weekday() not in weekends:
+            num_workdays -= 1
+    return num_workdays
 
 
 class ErrorsTicketsWindow(object):
@@ -38,7 +51,7 @@ class ErrorsTicketsWindow(object):
         self.today = datetime.today().date()
         dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
         bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
-        host_workdays = workdays.networkdays(self.host_start_day, self.today) - 1
+        host_workdays = networkdays_without_tuesday(self.host_start_day, self.today) - 1
         self.dev_today = dev_workdays % len(self.dev_list)
         self.bqa_today = bqa_workdays % len(self.bqa_list)
         self.host_today = host_workdays % (len(self.dev_list) + len(self.bqa_list))

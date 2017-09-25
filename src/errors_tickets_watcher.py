@@ -1,23 +1,12 @@
 # coding=utf-8
 import json
 import threading
-import workdays
-from appJar import gui
 from datetime import datetime, date, timedelta
-from browsers_watcher import open_browser, watch
 
-(MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
+from . import workdays
+from appJar import gui
 
-
-def networkdays_without_tuesday(start_date, end_date):
-    weekends = (SAT, SUN, TUE)
-    delta_days = (end_date - start_date).days + 1
-    full_weeks, extra_days = divmod(delta_days, 7)
-    num_workdays = (full_weeks + 1) * (7 - len(weekends))
-    for d in range(1, 8 - extra_days):
-        if (end_date + timedelta(d)).weekday() not in weekends:
-            num_workdays -= 1
-    return num_workdays
+from src.browsers_watcher import open_browser, watch
 
 
 class ErrorsTicketsWindow(object):
@@ -51,7 +40,7 @@ class ErrorsTicketsWindow(object):
         self.today = datetime.today().date()
         dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
         bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
-        host_workdays = networkdays_without_tuesday(self.host_start_day, self.today) - 1
+        host_workdays = workdays.networkdays(self.host_start_day, self.today, weekends=[1, 5, 6]) - 1
         self.dev_today = dev_workdays % len(self.dev_list)
         self.bqa_today = bqa_workdays % len(self.bqa_list)
         self.host_today = host_workdays % (len(self.dev_list) + len(self.bqa_list))
@@ -105,7 +94,7 @@ class ErrorsTicketsWindow(object):
 
     def move_host_list(self, btn):
         self.host_today = (self.host_today + 1) % (len(self.dev_list) + len(self.bqa_list))
-        host_start = workdays.workday(self.today, -self.host_today)
+        host_start = workdays.workday(self.today, -self.host_today, weekends=[1, 5, 6])
         self.data['host_start_day'] = [host_start.year, host_start.month, host_start.day]
         self.host_start_day = date(*self.data['host_start_day'])
         self.set_person_today()
@@ -117,6 +106,7 @@ class ErrorsTicketsWindow(object):
 
     def check_browsers_alive(self):
         if not self.browsers_watching.isAlive():
+            self.pipelines = open_browser(self.data, self.w, self.h)
             self.browsers_watching = threading.Thread(target=watch, args=[self.pipelines, self.bundle_dir])
             self.browsers_watching.start()
 
@@ -147,5 +137,5 @@ class ErrorsTicketsWindow(object):
         self.app.bindKey('<h>', self.move_host_list)
         self.app.setStopFunction(self.save_person_today)
         self.app.registerEvent(self.update_person)
-        self.app.setPollTime(600000)
+        self.app.setPollTime(60000)
         self.app.go()

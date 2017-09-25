@@ -1,12 +1,12 @@
 # coding=utf-8
 import json
 import threading
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 
-from . import workdays
 from appJar import gui
 
 from src.browsers_watcher import open_browser, watch
+from . import workdays
 
 
 class ErrorsTicketsWindow(object):

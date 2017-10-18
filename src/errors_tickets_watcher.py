@@ -1,7 +1,7 @@
 # coding=utf-8
 import json
 import threading
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from appJar import gui
 
@@ -38,9 +38,9 @@ class ErrorsTicketsWindow(object):
 
     def get_person_today(self):
         self.today = datetime.today().date()
-        dev_workdays = workdays.networkdays(self.dev_start_day, self.today) - 1
-        bqa_workdays = workdays.networkdays(self.bqa_start_day, self.today) - 1
-        host_workdays = workdays.networkdays(self.host_start_day, self.today, weekends=[1, 5, 6]) - 1
+        dev_workdays = workdays.networkdays(self.dev_start_day + timedelta(1), self.today)
+        bqa_workdays = workdays.networkdays(self.bqa_start_day + timedelta(1), self.today)
+        host_workdays = workdays.networkdays(self.host_start_day + timedelta(1), self.today, weekends=[1, 5, 6])
         self.dev_today = dev_workdays % len(self.dev_list)
         self.bqa_today = bqa_workdays % len(self.bqa_list)
         self.host_today = host_workdays % (len(self.dev_list) + len(self.bqa_list))

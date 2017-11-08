@@ -50,7 +50,7 @@ def watch(watch_list, bundle_dir):
     sleep(10)
     dev_huddle = False
     while True:
-        if datetime.now().time() < time(9, 58) and datetime.now().weekday() < 5:
+        if datetime.now().time() < time(10, 28) and datetime.now().weekday() < 5:
             dev_huddle = True
         elif dev_huddle:
             for i in range(2):

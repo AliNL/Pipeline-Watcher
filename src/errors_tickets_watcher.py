@@ -1,7 +1,7 @@
 # coding=utf-8
 import json
 import threading
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 
 from appJar import gui
 
@@ -57,7 +57,8 @@ class ErrorsTicketsWindow(object):
             self.data['host_start_day'] = [self.today.year, self.today.month, self.today.day]
             self.bqa_start_day = date(*self.data['host_start_day'])
 
-        self.save_person_today()
+        if time(0, 5) < datetime.now().time() < time(23, 55):
+            self.save_person_today()
 
     def set_person_today(self):
         for dev in self.dev_list:

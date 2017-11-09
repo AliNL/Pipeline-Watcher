@@ -48,15 +48,13 @@ def watch(watch_list, bundle_dir):
         this_status = get_status(pipeline)
         last_status.append(this_status)
     sleep(10)
+    late_alert = False
     dev_huddle = False
+    stand_up = False
     while True:
-        if datetime.now().time() < time(10, 28) and datetime.now().weekday() < 5:
-            dev_huddle = True
-        elif dev_huddle:
-            for i in range(2):
-                system('afplay ' + bundle_dir + '/alarm.aiff -t 2.5 -v 10')
-                system('say "Dev huddle time[[slnc 800]]"')
-            dev_huddle = False
+        late_alert = alarm(late_alert, 'Late', (9, 16), bundle_dir)
+        stand_up = alarm(stand_up, 'Stand up', (9, 45), bundle_dir)
+        dev_huddle = alarm(dev_huddle, 'Dev huddle', (10, 28), bundle_dir)
         i = 0
         for pipeline in watch_list:
             current_status = get_status(pipeline)
@@ -68,3 +66,14 @@ def watch(watch_list, bundle_dir):
             last_status[i] = current_status
             i += 1
         sleep(10)
+
+
+def alarm(should_alarm_today, event_name, alarm_time, bundle_dir):
+    if datetime.now().time() < time(*alarm_time) and datetime.now().weekday() < 5:
+        return True
+    elif should_alarm_today:
+        for i in range(2):
+            system('afplay ' + bundle_dir + '/alarm.aiff -t 2.5 -v 10')
+            system(f'say "{event_name} time[[slnc 800]]"')
+        return False
+    return False

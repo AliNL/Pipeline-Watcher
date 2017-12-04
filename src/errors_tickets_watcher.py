@@ -113,7 +113,7 @@ class ErrorsTicketsWindow(object):
 
     def start(self):
         self.app.setGeom(int(self.w / 2), int(self.h * 0.4 - 25))
-        self.app.setLocation(0, int(self.h * 0.6 + 10))
+        self.app.setLocation(int(self.w / 2), int(self.h * 0.6 + 10))
         self.app.setGuiPadding(50, 40)
         self.app.setFont(32)
         self.app.setPadding(10, 30)

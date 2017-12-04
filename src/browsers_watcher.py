@@ -7,24 +7,26 @@ from selenium.common.exceptions import WebDriverException
 
 
 def open_browser(data, w, h):
-    ci = webdriver.Chrome()
-    ci.set_window_size(w / 2, h * 0.6)
-    ci.set_window_position(0, 0)
-    ci.get('https://goci.psa.thoughtworks.net/go/pipelines')
-    sleep(1)
-    ci.find_element_by_id('user_login').send_keys(data["ci_username"])
-    ci.find_element_by_id('user_password').send_keys(data["ci_password"])
-    ci.find_element_by_id('signin2').click()
+    # ci = webdriver.Chrome()
+    # ci.set_window_size(w / 2, h * 0.6)
+    # ci.set_window_position(0, 0)
+    # ci.get('https://goci.psa.thoughtworks.net/go/pipelines')
+    # sleep(1)
+    # ci.find_element_by_id('user_login').send_keys(data["ci_username"])
+    # ci.find_element_by_id('user_password').send_keys(data["ci_password"])
+    # ci.find_element_by_id('signin2').click()
 
-    cd = webdriver.Chrome()
-    cd.set_window_size(w / 2, h)
-    cd.set_window_position(w / 2 + 1, 0)
+    cd = webdriver.Firefox()
+    # cd.set_window_size(w / 2, h)
+    # cd.set_window_position(w / 2 + 1, 0)
+    cd.maximize_window()
     cd.get('https://gocd.thoughtworks.net/go/pipelines')
     sleep(1)
     cd.find_element_by_id('user_login').send_keys(data["cd_username"])
     cd.find_element_by_id('user_password').send_keys(data["cd_password"])
+    sleep(1)
     cd.find_element_by_id('signin2').click()
-    return ci, cd
+    return [cd]
 
 
 def get_status(pipeline, retry=5):

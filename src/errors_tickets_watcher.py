@@ -55,7 +55,7 @@ class ErrorsTicketsWindow(object):
 
         if self.host_today == 0 and self.data['host_start_day'][2] != self.today.day:
             self.data['host_start_day'] = [self.today.year, self.today.month, self.today.day]
-            self.bqa_start_day = date(*self.data['host_start_day'])
+            self.host_start_day = date(*self.data['host_start_day'])
 
         if time(0, 5) < datetime.now().time() < time(23, 55):
             self.save_person_today()

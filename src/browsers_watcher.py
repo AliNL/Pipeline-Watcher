@@ -50,13 +50,11 @@ def watch(watch_list, bundle_dir):
         this_status = get_status(pipeline)
         last_status.append(this_status)
     sleep(10)
-    late_alert = False
-    dev_huddle = False
     stand_up = False
+    dev_huddle = False
     while True:
-        late_alert = alarm(late_alert, 'Late', (9, 16), bundle_dir)
-        stand_up = alarm(stand_up, 'Stand up', (9, 45), bundle_dir)
-        dev_huddle = alarm(dev_huddle, 'Dev huddle', (10, 28), bundle_dir)
+        stand_up = alarm(stand_up, 'Stand up', (9, 0), bundle_dir)
+        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 29), bundle_dir)
         i = 0
         for pipeline in watch_list:
             current_status = get_status(pipeline)

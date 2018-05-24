@@ -3,5 +3,5 @@
 /Pipeline Watcher.iml
 /build/
 /dist/
-/data.json
+data.json
 /geckodriver.log

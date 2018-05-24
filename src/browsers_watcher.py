@@ -1,24 +1,18 @@
 # coding=utf-8
 from datetime import datetime, time
-from time import sleep
 from os import system
+from time import sleep
+
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
+WORK_DAYS = [0, 1, 2, 3, 4]
+TUESDAY = [1]
+NOT_TUESDAY = [0, 2, 3, 4]
 
-def open_browser(data, w, h):
-    # ci = webdriver.Chrome()
-    # ci.set_window_size(w / 2, h * 0.6)
-    # ci.set_window_position(0, 0)
-    # ci.get('https://goci.psa.thoughtworks.net/go/pipelines')
-    # sleep(1)
-    # ci.find_element_by_id('user_login').send_keys(data["ci_username"])
-    # ci.find_element_by_id('user_password').send_keys(data["ci_password"])
-    # ci.find_element_by_id('signin2').click()
 
+def open_browser(data):
     cd = webdriver.Firefox()
-    # cd.set_window_size(w / 2, h)
-    # cd.set_window_position(w / 2 + 1, 0)
     cd.maximize_window()
     cd.get('https://gocd.thoughtworks.net/go/pipelines')
     sleep(1)
@@ -52,9 +46,13 @@ def watch(watch_list, bundle_dir):
     sleep(10)
     stand_up = False
     dev_huddle = False
+    ipm = False
+    late = False
     while True:
-        stand_up = alarm(stand_up, 'Stand up', (9, 0), bundle_dir)
-        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 29), bundle_dir)
+        stand_up = alarm(stand_up, 'Stand up', (9, 0), bundle_dir, NOT_TUESDAY)
+        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 29), bundle_dir, NOT_TUESDAY)
+        ipm = alarm(ipm, 'IPM', (9, 44), bundle_dir, TUESDAY)
+        late = alarm(late, 'Late', (9, 0), bundle_dir, TUESDAY)
         i = 0
         for pipeline in watch_list:
             current_status = get_status(pipeline)
@@ -68,8 +66,8 @@ def watch(watch_list, bundle_dir):
         sleep(10)
 
 
-def alarm(should_alarm_today, event_name, alarm_time, bundle_dir):
-    if datetime.now().time() < time(*alarm_time) and datetime.now().weekday() < 5:
+def alarm(should_alarm_today, event_name, alarm_time, bundle_dir, weekdays=WORK_DAYS):
+    if datetime.now().time() < time(*alarm_time) and datetime.now().weekday() in weekdays:
         return True
     elif should_alarm_today:
         for i in range(2):

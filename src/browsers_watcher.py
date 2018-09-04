@@ -14,7 +14,7 @@ NOT_TUESDAY = [0, 2, 3, 4]
 def open_browser(data):
     cd = webdriver.Firefox()
     cd.maximize_window()
-    cd.get('https://gocd.thoughtworks.net/go/pipelines')
+    cd.get(data["cd_url"])
     sleep(1)
     cd.find_element_by_id('user_login').send_keys(data["cd_username"])
     cd.find_element_by_id('user_password').send_keys(data["cd_password"])
@@ -24,13 +24,10 @@ def open_browser(data):
 
 
 def get_status(pipeline, retry=5):
-    url_length = len(pipeline.current_url) + 1
     try:
-        status_elements = pipeline.find_elements_by_css_selector('a.stage')
-        current_status = [s.get_attribute('href')[url_length:] for s in status_elements
-                          if 'Fail' in s.find_element_by_css_selector('div.stage_bar').get_attribute('title')]
-        psa_status = [s for s in current_status if not s.startswith('Identity') and not s.startswith('GoFigure')]
-        return psa_status
+        status_elements = pipeline.find_elements_by_css_selector('a.pipeline_stage.failed')
+        current_status = [s.get_attribute('href').split('/go/pipelines/')[1] for s in status_elements]
+        return current_status
     except WebDriverException:
         if retry > 0:
             return get_status(pipeline, retry - 1)

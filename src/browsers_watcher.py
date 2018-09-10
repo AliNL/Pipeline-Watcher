@@ -47,8 +47,8 @@ def watch(watch_list, bundle_dir):
     late = False
     while True:
         stand_up = alarm(stand_up, 'Stand up', (9, 0), bundle_dir, NOT_TUESDAY)
-        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 29), bundle_dir, NOT_TUESDAY)
-        ipm = alarm(ipm, 'IPM', (9, 44), bundle_dir, TUESDAY)
+        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 59), bundle_dir, NOT_TUESDAY)
+        ipm = alarm(ipm, 'IPM', (9, 43), bundle_dir, TUESDAY)
         late = alarm(late, 'Late', (9, 0), bundle_dir, TUESDAY)
         i = 0
         for pipeline in watch_list:

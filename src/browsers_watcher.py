@@ -46,10 +46,10 @@ def watch(watch_list, bundle_dir):
     ipm = False
     late = False
     while True:
-        stand_up = alarm(stand_up, 'Stand up', (9, 0), bundle_dir, NOT_TUESDAY)
+        stand_up = alarm(stand_up, 'Stand up', (9, 45), bundle_dir, NOT_TUESDAY)
         dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 59), bundle_dir, NOT_TUESDAY)
-        ipm = alarm(ipm, 'IPM', (9, 43), bundle_dir, TUESDAY)
-        late = alarm(late, 'Late', (9, 0), bundle_dir, TUESDAY)
+        ipm = alarm(ipm, 'IPM', (9, 44), bundle_dir, TUESDAY)
+        late = alarm(late, 'Late', (9, 15), bundle_dir, TUESDAY)
         i = 0
         for pipeline in watch_list:
             current_status = get_status(pipeline)

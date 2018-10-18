@@ -2,7 +2,7 @@
 from datetime import datetime, time
 from os import system
 from time import sleep
-
+import re
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 
@@ -47,7 +47,7 @@ def watch(watch_list, bundle_dir):
     late = False
     while True:
         stand_up = alarm(stand_up, 'Stand up', (9, 45), bundle_dir, NOT_TUESDAY)
-        dev_huddle = alarm(dev_huddle, 'Dev huddle', (9, 59), bundle_dir, NOT_TUESDAY)
+        dev_huddle = alarm(dev_huddle, 'Dev huddle', (15, 59), bundle_dir, NOT_TUESDAY)
         ipm = alarm(ipm, 'IPM', (9, 44), bundle_dir, TUESDAY)
         late = alarm(late, 'Late', (9, 15), bundle_dir, TUESDAY)
         i = 0
@@ -57,7 +57,8 @@ def watch(watch_list, bundle_dir):
                 if status not in last_status[i]:
                     print(datetime.now().strftime("[%Y-%m-%d %H:%M:%S]"), status)
                     system('say "Pipeline Broken[[slnc 1000]]"')
-                    system('say "' + status.replace("/", "[[slnc 300]]") + '"')
+                    string = ' '.join(re.split('[^\w/]', status))
+                    system('say "' + string.replace("/", "[[slnc 300]]") + '"')
             last_status[i] = current_status
             i += 1
         sleep(10)

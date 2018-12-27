@@ -5,3 +5,4 @@
 /dist/
 data.json
 /geckodriver.log
+src/__pycache__/

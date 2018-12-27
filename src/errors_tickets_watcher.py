@@ -1,6 +1,5 @@
 # coding=utf-8
 import json
-import threading
 from datetime import datetime, date, timedelta, time
 
 from appJar import gui
@@ -19,6 +18,14 @@ class ErrorsTicketsWindow(object):
         self.dev_start_day = date(*self.data['dev_start_day'])
         self.bqa_start_day = date(*self.data['bqa_start_day'])
         self.host_start_day = date(*self.data['host_start_day'])
+        self.holidays = []
+        self.extraworkdays = []
+        for i in self.data['holidays']:
+            self.holidays.append(datetime.strptime(i,'%Y-%m-%d').date())
+
+        for j in self.data['extraworkdays']:
+            self.extraworkdays.append(datetime.strptime(j,'%Y-%m-%d').date())
+
         self.dev_today = 0
         self.bqa_today = 0
         self.host_today = 0
@@ -34,9 +41,9 @@ class ErrorsTicketsWindow(object):
 
     def get_person_today(self):
         self.today = datetime.today().date()
-        dev_workdays = workdays.networkdays(self.dev_start_day + timedelta(1), self.today)
-        bqa_workdays = workdays.networkdays(self.bqa_start_day + timedelta(1), self.today)
-        host_workdays = workdays.networkdays(self.host_start_day + timedelta(1), self.today, weekends=[1, 5, 6])
+        dev_workdays = workdays.networkdays(self.dev_start_day + timedelta(1), self.today, self.holidays, None, self.extraworkdays)
+        bqa_workdays = workdays.networkdays(self.bqa_start_day + timedelta(1), self.today, self.holidays, None, self.extraworkdays)
+        host_workdays = workdays.networkdays(self.host_start_day + timedelta(1), self.today, self.holidays,[1, 5, 6], self.extraworkdays)
         self.dev_today = dev_workdays % len(self.dev_list)
         self.bqa_today = bqa_workdays % len(self.bqa_list)
         self.host_today = host_workdays % (len(self.dev_list) + len(self.bqa_list))
@@ -104,9 +111,8 @@ class ErrorsTicketsWindow(object):
     def start(self):
         self.app.setGeom(int(self.w / 2), int(self.h * 0.4 - 25))
         self.app.setLocation(int(self.w / 2), int(self.h * 0.6 + 10))
-        self.app.setGuiPadding(50, 40)
         self.app.setFont(32)
-        self.app.setPadding(10, 30)
+        self.app.setPadding(10, 10)
 
         for i in range(len(self.dev_list)):
             self.app.addLabel(self.dev_list[i], self.dev_list[i], 0, i, 1, 1)
@@ -114,9 +120,9 @@ class ErrorsTicketsWindow(object):
         for j in range(len(self.bqa_list)):
             self.app.addLabel(self.bqa_list[j], self.bqa_list[j], 1, j, 1, 1)
 
-        self.app.addLabel("help", """按 d 移动Dev\n按 b 移动BA/QA\n按 h 移动Host""", 1, j + 1, i - j, 1)
-        self.app.setLabelFg("help", "#A6A6A6")
-        self.app.getLabelWidget("help").config(font=12)
+        # self.app.addLabel("help", """按 d 移动Dev\n按 b 移动BA/QA\n按 h 移动Host""", 1, j + 1, i - j, 1)
+        # self.app.setLabelFg("help", "#A6A6A6")
+        # self.app.getLabelWidget("help").config(font=12)
 
         self.app.setAllLabelWidths(15)
         self.app.setAllLabelHeights(1)

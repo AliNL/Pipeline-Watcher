@@ -7,7 +7,7 @@ from datetime import timedelta
 (MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
 
 
-def networkdays(start_date, end_date, holidays=None, weekends=None):
+def networkdays(start_date, end_date, holidays=None, weekends=None, extraworkdays=[]):
     if weekends is None:
         weekends = [SAT, SUN]
     if holidays is None:
@@ -26,6 +26,11 @@ def networkdays(start_date, end_date, holidays=None, weekends=None):
     for d in holidays:
         if start_date <= d <= end_date:
             num_workdays -= 1
+
+    for d in extraworkdays:
+        if start_date <= d <= end_date:
+            num_workdays += 1
+
     return num_workdays
 
 

@@ -111,8 +111,9 @@ class ErrorsTicketsWindow(object):
     def start(self):
         self.app.setGeom(int(self.w / 2), int(self.h * 0.4 - 25))
         self.app.setLocation(int(self.w / 2), int(self.h * 0.6 + 10))
+        self.app.setGuiPadding(50, 40)
         self.app.setFont(32)
-        self.app.setPadding(10, 10)
+        self.app.setPadding(10, 30)
 
         for i in range(len(self.dev_list)):
             self.app.addLabel(self.dev_list[i], self.dev_list[i], 0, i, 1, 1)
@@ -120,9 +121,9 @@ class ErrorsTicketsWindow(object):
         for j in range(len(self.bqa_list)):
             self.app.addLabel(self.bqa_list[j], self.bqa_list[j], 1, j, 1, 1)
 
-        # self.app.addLabel("help", """按 d 移动Dev\n按 b 移动BA/QA\n按 h 移动Host""", 1, j + 1, i - j, 1)
-        # self.app.setLabelFg("help", "#A6A6A6")
-        # self.app.getLabelWidget("help").config(font=12)
+        self.app.addLabel("help", """按 d 移动Dev\n按 b 移动BA/QA\n按 h 移动Host""", 1, j + 1, i - j, 1)
+        self.app.setLabelFg("help", "#A6A6A6")
+        self.app.getLabelWidget("help").config(font=12)
 
         self.app.setAllLabelWidths(15)
         self.app.setAllLabelHeights(1)
